@@ -14,7 +14,6 @@ app.controller('MainCtrl', function ($scope, socket) {
   });
 
   socket.on('initial-leaderboard', function (leaderboard) {
-    console.log(leaderboard);
     $scope.leaderboard = leaderboard;
   });
 
