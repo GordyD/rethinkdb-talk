@@ -1,0 +1,20 @@
+{
+  "name": "realtime-talk-demo",
+  "version": "0.0.0",
+  "private": true,
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "bluebird": "^2.9.30",
+    "bows": "^1.4.3",
+    "config": "^1.14.0",
+    "debug": "~2.2.0",
+    "express": "^4.13.0",
+    "jade": "~1.9.2",
+    "morgan": "~1.5.3",
+    "rethinkdb": "2.0.0-2",
+    "serve-favicon": "~2.2.1",
+    "socket.io": "^1.3.5"
+  }
+}

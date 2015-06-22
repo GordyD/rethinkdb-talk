@@ -1,0 +1,11 @@
+doctype html
+html
+  head
+    title= title
+    link(rel='stylesheet', href='/stylesheets/style.css')
+  body(ng-app="realtimeTalkApp")
+    block content
+    script(src="/js/angular.min.js")
+    script(src="/socket.io/socket.io.js")
+    script(src="/js/socket.min.js")
+    script(src="/js/client.js")

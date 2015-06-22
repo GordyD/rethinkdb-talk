@@ -1,0 +1,19 @@
+extends layout
+
+block content
+    div(ng-controller="MainCtrl")
+      h1 Rethink Realtime Demo
+      p Name: {{character.name}}
+      p Power: {{character.maxStrength}}
+      button(ng-click="powerUp()") Power Up!
+
+      h2 Leaderboard
+      table
+        thead
+            tr
+                th Name
+                th Score
+        tbody
+            tr(ng-repeat="entry in leaderboard| orderBy: 'maxStrength': true")
+                td {{entry.name}}
+                td {{entry.maxStrength | number}}
