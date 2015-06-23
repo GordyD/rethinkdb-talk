@@ -48,6 +48,7 @@ function wireUpSockets() {
       console.error(err);
     } else {
       cursor.each(function(err, changes) {
+        console.log(changes);
         io.emit('update-leaderboard', changes);
       });
     }

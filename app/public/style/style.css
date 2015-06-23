@@ -1,6 +1,10 @@
+* {
+  font-family: 'Roboto Condensed', sans-serif;
+}
+
+
 body {
   background-color: rgb(255, 229, 199);
-  font-family: 'Roboto Condensed', sans-serif;
 }
 
 .header  {
@@ -21,7 +25,7 @@ body {
 }
 
 .container {
-  position: fixed;
+  position: absolute;
   top: 80px;
   width: 100%;
 }
@@ -32,6 +36,12 @@ body {
   text-align: center;
   margin: 10px auto;
   width: 156px;
+}
+
+.center {
+  text-align: center;
+  margin-left: auto;
+  margin-right: center;
 }
 
 .page-width {

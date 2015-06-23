@@ -4,7 +4,7 @@ block content
     div(ng-controller="MainCtrl")
         .pure-g
             .pure-u-1-1.pure-u-md-1-2.your-character
-                div(ng-if="character")
+                .center(ng-if="character")
                     h2 Your Character
                     img.avatar(src="{{character.image}}")
                     p Name: {{character.name}}
@@ -12,7 +12,7 @@ block content
                     button.pure-button.power(ng-click="powerUp()") Power Up!
                     button.pure-button.heal(ng-click="heal()", ng-if="character.damage > 0") Heal!
                 div(ng-if="!character")
-                    p No more spaces left!
+                    h2 No more player spaces left!
             .pure-u-1-1.pure-u-md-1-2.game
                 h2 Game
                 table.pure-table
@@ -23,8 +23,11 @@ block content
                             th Score
                             th Actions
                     tbody
-                        tr(ng-repeat="entry in leaderboard| orderBy: 'maxStrength-damage': true", ng-class="{active: entry.status == 'active', healing: entry.status === 'healing', inactive: entry.status === 'inactive'}")
+                        tr(
+                            ng-repeat="entry in leaderboard | orderBy: 'maxStrength-damage': true", 
+                            ng-class="{active: entry.status == 'active', inactive: entry.status === 'inactive'}"
+                        )
                             td: img.avatar(src="{{entry.image}}", alt="{{entry.name}}")
                             td {{entry.name}}
                             td {{entry.maxStrength - entry.damage | number}}
-                            td: button(ng-if="entry.id !== character.id && entry.status === 'active' && entry.maxStrength > entry.damage", ng-click="attack(entry)").pure-button.button-small.button-attack Attack
+                            td: button(ng-if="character && entry.id !== character.id && entry.status === 'active' && entry.maxStrength > entry.damage", ng-click="attack(entry)").pure-button.button-small.button-attack Attack

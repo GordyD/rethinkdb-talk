@@ -17,7 +17,7 @@ app.controller('MainCtrl', function ($scope, socket) {
   });
 
   socket.on('update-leaderboard', function (change) {
-    if (change.new_val.id === $scope.character.id) {
+    if ($scope.character && change.new_val.id === $scope.character.id) {
       $scope.character = change.new_val;
     } 
 
@@ -30,14 +30,14 @@ app.controller('MainCtrl', function ($scope, socket) {
   });
 
   $scope.powerUp = function() {
-    socket.emit('power-up', $scope.character);
+    socket.emit('power-up', angular.copy($scope.character));
   };
 
   $scope.heal = function() {
-    socket.emit('heal', $scope.character);
+    socket.emit('heal', angular.copy($scope.character));
   };
 
   $scope.attack = function(other) {
-    socket.emit('attack', other);
+    socket.emit('attack', angular.copy(other));
   };
 });
