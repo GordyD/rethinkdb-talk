@@ -30,10 +30,11 @@ On `s2`
 rethinkdb --join 192.168.33.11:29015 --bind all
 ```
 
-On either box:
+On either box to add fixtures and fire up box:
 
 ```bash
 cd /vagrant
 npm install
 node app/data/rethinkdb.js
+npm start
 ```
