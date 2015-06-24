@@ -1,36 +1,44 @@
-// Setup basic express server
+/**
+ * Dependencies
+ */
 var express = require('express');
 var app = express();
 var server = require('http').createServer(app);
 var config = require('config');
+var Promise = require('bluebird');
 var r = require('rethinkdb');
 var io = require('socket.io')(server);
 var port = process.env.PORT || 3000;
+var conn = null, characters = null;
 
-// Port
-server.listen(port, function () {
-  console.log('Server listening at port %d', port);
-});
-
-// Templating
+/**
+ * Set up express server
+ */
 app.set('view engine', 'jade');
-
-// Routing
 app.use(express.static(__dirname + '/public'));
 app.get('/', function (req, res) {
   res.render('index');
 });
 
-var conn = null;
-var characters = null;
+server.listen(port, function () {
+  console.log('Server listening at port %d', port);
+});
 
+/**
+ * Promise chain to set up RethinkDB connection
+ * and socket
+ */
 r.connect(config.rethinkdb)
 .then(storeConnection)
+.then(resetStatuses)
 .then(wireUpSockets);
 
 function storeConnection(newConn) {
   conn = newConn;
-  console.log(' [.] Db Connected.');
+}
+
+function resetStatuses() {
+  return r.table('characters').update({ status: 'inactive' }).run(conn)
 }
 
 function loadCharacters() {
@@ -40,9 +48,15 @@ function loadCharacters() {
   });
 }
 
-function wireUpSockets() {
-
-  r.table('characters').orderBy({index: r.desc('maxStrength')}).changes()
+function wireUpSockets(foo,bar) {
+  /**
+   * Change feed for leaderboard
+   */
+  r
+  .table('characters')
+  .orderBy({index: r.desc('maxStrength')})
+  .limit(10)
+  .changes()
   .run(conn, function(err, cursor) {
     if (err) {
       console.error(err);
@@ -54,8 +68,6 @@ function wireUpSockets() {
     }
   });
 
-
-  // When a new user connects to the application
   io.on('connection', function (socket) {
     console.log(' [.] New user!');
     var assignedId = null;
@@ -63,30 +75,45 @@ function wireUpSockets() {
     socket.on('disconnect', function() {
       if (assignedId !== null) {
         console.log(' [.] Disconnected User');
-        r.table('characters').get(assignedId).update({status: 'inactive'}).run(conn);
+        r
+        .table('characters')
+        .get(assignedId)
+        .update({status: 'inactive'})
+        .run(conn);
       }
     });
 
     socket.on('power-up', function (data) {
       console.log(' [.] Power up', data.name);
-      data.maxStrength += (Math.floor(Math.random() * 3) + 1);
-      r.table('characters').filter({id: data.id}).update(data).run(conn);
+      var change = (Math.floor(Math.random() * 3) + 1);
+
+      r
+      .table('characters')
+      .filter({id: data.id})
+      .update({ maxStrength: r.row('maxStrength').add(change) })
+      .run(conn);
     });
 
     socket.on('attack', function (data) {
       console.log(' [.] Attack', data.name);
-      data.damage += (Math.floor(Math.random() * 4) + 1);
-      r.table('characters').filter({id: data.id}).update(data).run(conn);
+      var change = (Math.floor(Math.random() * 4) + 1);
+
+      r
+      .table('characters')
+      .filter({id: data.id})
+      .update({ damage: r.row('damage').add(change) })
+      .run(conn);
     });
 
     socket.on('heal', function (data) {
       console.log(' [.] Heal', data.name);
-      if (data.damage < 2) {
-        data.damage = 0;
-      } else {
-        data.damage -= 2;
-      }
-      r.table('characters').filter({id: data.id}).update(data).run(conn);
+      data.damage = (data.damage < 2) ? 0 : data.damage - 2;
+
+      r
+      .table('characters')
+      .filter({id: data.id})
+      .update({damage: data.damage})
+      .run(conn);
     });
 
     loadCharacters()
